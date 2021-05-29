@@ -59,7 +59,7 @@ def read_in_chunks(path, new_path, chunk_size, columns):
             new_dict = json.loads(line)
             rows_list.append({**empty_row, **new_dict})
 
-            if (i % chunk_size) == 0:
+            if ((i+1) % chunk_size) == 0:
                 pd.DataFrame(rows_list).to_csv(new_path, mode=mode, index=False, header=(mode=='w'))
                 rows_list = []
                 mode = 'a'
