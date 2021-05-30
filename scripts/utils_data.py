@@ -16,9 +16,17 @@
 """
 # IMPORTS 
 import json 
+import numpy as np 
 import pandas as pd
 import datetime
 
+# Dtypes for simplififed version of data
+DTYPES_SIMPLE = {'overall':np.int16,
+                 'vote':np.int64,
+                 'reviewText':object,
+                 'reviewMonth':np.int16,
+                 'reviewYear':np.int16,
+                 }
 
 def read_in_chunks(path, new_path, chunk_size, columns):
     """Reads big json file line by line and saves it to csv file by chunk.
