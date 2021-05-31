@@ -55,5 +55,5 @@ def show_distribution(series_count, title, xlabel, normalize=None, norm_name='',
     plt.title(title, fontsize=16)
     plt.ylabel(ylabel)
     plt.xlabel(xlabel)
-    plt.show()
+    return fig
 
