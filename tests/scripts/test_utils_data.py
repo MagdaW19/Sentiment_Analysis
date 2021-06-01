@@ -16,6 +16,7 @@
 """
 import pytest 
 from scripts.utils_data import read_in_chunks
+from scripts.utils_data import range_without_outliers
 import pandas as pd
 import json
 
@@ -31,6 +32,33 @@ def prepare_file(tmpdir):
         f.write(json.dumps({'name':'Wiola'})+'\n')
         f.write(json.dumps({'name':'Radek','age':16,'height':1.93})+'\n')
     yield json_path, csv_path, columns_list
+
+@pytest.fixture
+def prepare_series():
+    series = pd.Series([1,2,3,4,5,6,7,8,9,10])
+    mean_value = series.mean()
+    std_value = series.std()
+    return series, mean_value, std_value
+
+class TestRangeWithoutOutliers(object):
+    def test_range_normal(self, prepare_series):
+        series, mean_value, std_value = prepare_series
+        lower, upper = range_without_outliers(series) 
+        assert lower == pytest.approx((mean_value - (3*std_value)), rel=1e-2)
+        assert upper == pytest.approx((mean_value + (3*std_value)), rel=1e-2)
+
+    def test_range_with_valid_lower(self, prepare_series):
+        series, mean_value, std_value = prepare_series
+        lower, upper = range_without_outliers(series, lower=0.) 
+        assert lower == pytest.approx(0.)
+        assert upper == pytest.approx((mean_value + (3*std_value)), rel=1e-2)
+
+    def test_range_with_valid_upper(self, prepare_series):
+        series, mean_value, std_value = prepare_series
+        lower, upper = range_without_outliers(series, upper=10.) 
+        assert lower == pytest.approx((mean_value - 3*std_value), rel=1e-2)
+        assert upper == pytest.approx(10.)
+
 
 class TestReadInChunks(object):
     def test_normal_chunks(self, prepare_file):

@@ -28,6 +28,33 @@ DTYPES_SIMPLE = {'overall':np.int16,
                  'reviewYear':np.int16,
                  }
 
+def range_without_outliers(series, lower=None, upper=None):
+    """Function calculates lower and upper boundary for data without outliers.
+    [std - 3*mean, std + 3*mean]
+    Boundaries can be restricted manually in case of data that is naturally restricted on one side,
+    e.g. count of words which naturally includes only positive values.
+
+    Parameters
+    ----------
+    series : pd.Series
+        pandas series with data 
+    lower : int, optional
+        manually set lower boundary, by default None
+    upper : int, optional
+        manually set upper boundary, by default None
+    """
+    std_value = series.std()
+    mean_value = series.mean()
+    lower_range, upper_range = (mean_value - (3*std_value)), (mean_value + (3*std_value))
+
+    if lower is not None:
+        lower_range = lower
+    if upper is not None:
+        upper_range = upper
+    
+    return lower_range, upper_range
+
+
 def read_in_chunks(path, new_path, chunk_size, columns):
     """Reads big json file line by line and saves it to csv file by chunk.
     Each line of json file should be a python dict with keys representing columns names. 
