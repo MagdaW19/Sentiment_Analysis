@@ -19,6 +19,9 @@ import json
 import numpy as np 
 import pandas as pd
 import datetime
+# Text Preprocessing
+import spacy
+nlp = spacy.load('en_core_web_sm')
 
 # Dtypes for simplififed version of data
 DTYPES_SIMPLE = {'overall':np.int16,
@@ -27,6 +30,42 @@ DTYPES_SIMPLE = {'overall':np.int16,
                  'reviewMonth':np.int16,
                  'reviewYear':np.int16,
                  }
+def calc_weights(series):
+    """Function that calculates weights for each distinct value to balance the dataset.
+
+    Parameters
+    ----------
+    series : pandas.Series
+        Series with values on which we want to calculate weights.
+
+    Returns
+    -------
+    weight_values: pandas.Series
+        Series with distinct values in index and weight for that value in column.
+        Can be used with pd.Series.map function.
+    """
+    series_cnt = series.value_counts()
+    series_weights = series_cnt.sum()/series_cnt
+    return series_weights
+
+def lemma(text):
+    """Returns lemmatized version of text.
+
+    Parameters
+    ----------
+    text : str
+        Text to lemmatize
+
+    Returns
+    -------
+    str
+        Lemmatized version of text
+    """
+    if isinstance(text, str):
+        doc = nlp(text)
+        return " ".join([token.lemma_ for token in doc if token.is_alpha and token.lemma_ != '-PRON-'])
+    else:
+        return text
 
 def range_without_outliers(series, lower=None, upper=None):
     """Function calculates lower and upper boundary for data without outliers.
